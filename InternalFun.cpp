@@ -42,7 +42,7 @@ bitset<64> RC[24] =
 Binary internalFun(Binary stateVar)
 {
 
-	for(int i=0; i<1; i++)
+	for(int i=0; i<24; i++)
 		stateVar = roundFun( stateVar, RC[i] ) ;
 
 	return stateVar ;
@@ -60,9 +60,10 @@ Binary roundFun(Binary stateVar, bitset<64> singleRC)
 	for(int y=0;y<5;y++){
 		for(int x=0;x<5;x++){
 			bitset<64> tmp( stateVarStr.substr((x+5*y)<<6,64) );
-			L[24-(x+5*y)] = tmp;
+			L[x+5*y] = tmp;
 		}
 	}
+
 
 	/*** Theta ***/
 	bitset<64> C[5];
@@ -71,11 +72,11 @@ Binary roundFun(Binary stateVar, bitset<64> singleRC)
 		C[x]=L[x] ^ L[x+5] ^ L[x+10] ^ L[x+15] ^ L[x+20];
 	}
 
-	D[0]=C[4] ^ ROTL( C[1], 1);
-	D[1]=C[0] ^ ROTL( C[2], 1);
-	D[2]=C[1] ^ ROTL( C[3], 1);
-	D[3]=C[2] ^ ROTL( C[4], 1);
-	D[4]=C[3] ^ ROTL( C[0], 1);
+	D[0]=C[4] ^ ROTR( C[1], 1);
+	D[1]=C[0] ^ ROTR( C[2], 1);
+	D[2]=C[1] ^ ROTR( C[3], 1);
+	D[3]=C[2] ^ ROTR( C[4], 1);
+	D[4]=C[3] ^ ROTR( C[0], 1);
 
 
 	for(int x=0;x<5;x++){
@@ -89,23 +90,10 @@ Binary roundFun(Binary stateVar, bitset<64> singleRC)
 	/*** Rho  ***/
 	int rot_pos[25]={0,1,62,28,27,36,44,6,55,20,3,10,43,25,39,41,45,15,21,8,18,2,61,56,14};
 	for(int i=0;i<25;i++){
-		L[i] = ROTL(L[i],rot_pos[i]);
+		L[i] = ROTR(L[i],rot_pos[i]);
 	}
 
 	/*** Pi ***/
-	/*
-	int start_x=0,start_y=1;
-	int x=start_x,y=start_y;
-	do{
-		//cout<<"old (x,y) = ("<<x<<","<<y<<") index :"<<x+5*y;
-		int new_y=(2*x+3*y)%5;
-		x=y;
-		y=new_y;
-		//cout<<" new (x,y) = ("<<x<<","<<y<<") index :"<<x+5*y;
-		cout<<x+5*y<<",";
-
-	}while( !((x == start_x) && (y == start_y)) );
-	*/
 
 	//0 not change
 	int pi_order[24]={16,8,21,24,4,15,23,19,13,12,2,20,14,22,9,6,1,10,7,11,17,18,3,5};
@@ -115,7 +103,7 @@ Binary roundFun(Binary stateVar, bitset<64> singleRC)
 	}
 	L[16]=L5;
 
-	/*** Xi ***/
+  /*** Xi ***/
 	for(int y=0;y<5;y++){
 		bitset<64>tmpL[2];
 		tmpL[0]=L[0+5*y];
@@ -132,8 +120,7 @@ Binary roundFun(Binary stateVar, bitset<64> singleRC)
 
 	string metaString;
 	for(int i=0;i<25;i++){
-		//cout<<L[24-i];
-		metaString+=L[24-i].to_string();
+		metaString+=L[i].to_string();
 	}
 	return Binary(metaString);
 }

@@ -25,19 +25,22 @@ void SpongeConstruction(string inputString, int outputLen)
 
 
 	// Absorbing phase
-	/*** TODO: Implement your SHA3's absorbing phase here ***/
 	for(auto & block: Message){
 		block<<=CAPACITY;
 		//XOR with statevar
 		stateVar^=block;
 		stateVar=internalFun(stateVar);
 	}
-
 	// Squeezing phase
 	string hashVal ; // The final output value
-	/*** TODO: Implement your SHA3's squeezing phase here ***/
 	if(outputLen <BITRATE){
 		hashVal=stateVar.to_string().substr(0,outputLen);
+	}else{
+		hashVal+=stateVar.to_string().substr(0,BITRATE);
+		while(hashVal.length() < outputLen){
+			stateVar=internalFun(stateVar);
+			hashVal+=stateVar.to_string().substr(0,BITRATE);
+		}
 	}
 
 
@@ -66,18 +69,19 @@ void BinaryTransfer(string& inputString)
 
 vector< Binary > Padding(string inputString)
 {
-	/*** TODO: Implement with Multirate padding ***/
+	/*** Implement with Multirate padding ***/
 	vector< Binary > output;
 	unsigned int len=inputString.length();
-	if(len % BITRATE == 0){
-		inputString.append(pad);
+	if( (len+1) % BITRATE == 0){
+		inputString.push_back('1');
+		inputString.push_back('0');
 	}else{
 		inputString.push_back('1');
-		while(inputString.length() % BITRATE != 0){
-			inputString.push_back('0');
-		}
-		inputString.back()='1';
 	}
+	while(inputString.length() % BITRATE != 0){
+		inputString.push_back('0');
+	}
+	inputString.back()='1';
 	for(unsigned int i=0; i<inputString.length()/BITRATE; i++){
 		Binary tmp( inputString.substr(BITRATE * i, BITRATE) );
 		output.push_back(tmp);
