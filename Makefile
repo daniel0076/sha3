@@ -5,7 +5,10 @@ all: Main.o Sponge.o InternalFun.o
 	${CXX} $^ ${CXXFLAGS} -o SHA3
 
 %.o: %.cpp
-	${CXX} $< ${CXXFLAGS} -c 
+	${CXX} $< ${CXXFLAGS} -c
+
+test:
+	sh test.sh
 
 clean:
-	rm -rf SHA3 *.o	
+	rm -rf SHA3 *.o

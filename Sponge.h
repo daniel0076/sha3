@@ -13,7 +13,7 @@ using std::bitset ;
 
 typedef bitset<stateSize> Binary ;
 
-void SpongeConstruction( string inputString,unsigned int outputLen ) ;
+void SpongeConstruction( string inputString, int outputLen ) ;
 void BinaryTransfer(string& inputString) ;
 vector<Binary> Padding(string inputString) ;
 void PrintHex(string hashVal) ;
