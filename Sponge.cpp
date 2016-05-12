@@ -33,10 +33,12 @@ void SpongeConstruction(string inputString, int outputLen)
 		stateVar=internalFun(stateVar);
 	}
 
-
 	// Squeezing phase
 	string hashVal ; // The final output value
 	/*** TODO: Implement your SHA3's squeezing phase here ***/
+	if(outputLen <BITRATE){
+		hashVal=stateVar.to_string().substr(0,outputLen);
+	}
 
 
 	// Print the hash value to the stdout
@@ -48,7 +50,7 @@ void BinaryTransfer(string& inputString)
 {
 	string binary = "" ;
 
-	for(int i=0; i<inputString.length(); i++)
+	for(unsigned int i=0; i<inputString.length(); i++)
 	{
 		for(int k=7; k>=0; k--)
 			if( ((inputString[i] >> k) & 0x01) )
@@ -88,7 +90,7 @@ vector< Binary > Padding(string inputString)
 void PrintHex(string hashVal)
 {
 
-	for(int i=0; i<hashVal.length(); i+=4)
+	for(unsigned int i=0; i<hashVal.length(); i+=4)
 	{
 		string Ahex = hashVal.substr(i, 4) ;
 		int Val = 0 ;

@@ -39,10 +39,6 @@ bitset<64> RC[24] =
 };
 
 
-
-
-
-
 Binary internalFun(Binary stateVar)
 {
 
@@ -51,8 +47,6 @@ Binary internalFun(Binary stateVar)
 
 	return stateVar ;
 }
-
-
 
 
 /*** Round function in SHA-3 ***/
@@ -77,40 +71,69 @@ Binary roundFun(Binary stateVar, bitset<64> singleRC)
 		C[x]=L[x] ^ L[x+5] ^ L[x+10] ^ L[x+15] ^ L[x+20];
 	}
 
-	for(int i=0;i<5;i++){
-		D[i]=C[ (i-1)%5 ] ^ ROTL( C[(i+1) % 5], 1);
-	}
+	D[0]=C[4] ^ ROTL( C[1], 1);
+	D[1]=C[0] ^ ROTL( C[2], 1);
+	D[2]=C[1] ^ ROTL( C[3], 1);
+	D[3]=C[2] ^ ROTL( C[4], 1);
+	D[4]=C[3] ^ ROTL( C[0], 1);
+
 
 	for(int x=0;x<5;x++){
-		/*
-		for(int z=0;z<64;z++){
-			stateVar[((x)<<6)+z] =stateVar[((x)<<6)+z] ^ D[x][z];
-			stateVar[((x+5)<<6)+z] =stateVar[((x+5)<<6)+z] ^ D[x][z];
-			stateVar[((x+10)<<6)+z] =stateVar[((x+10)<<6)+z] ^ D[x][z];
-			stateVar[((x+15)<<6)+z] =stateVar[((x+15)<<6)+z] ^ D[x][z];
-			stateVar[((x+20)<<6)+z] =stateVar[((x+20)<<6)+z] ^ D[x][z];
-		}
-		*/
-		L[x] 	= L[x] 		^ D[x];
-		L[x+5] 	= L[x+5] 	^ D[x+5];
-		L[x+10] = L[x+10] 	^ D[x+10];
-		L[x+15] = L[x+15] 	^ D[x+15];
-		L[x+20] = L[x+20] 	^ D[x+20];
-	}
-
-	for(int i=0;i<25;i++){
-		cout<<L[24-i];
+		L[x] ^=D[x];
+		L[x+5] ^=D[x];
+		L[x+10] ^=D[x];
+		L[x+15] ^=D[x];
+		L[x+20] ^=D[x];
 	}
 
 	/*** Rho  ***/
-
+	int rot_pos[25]={0,1,62,28,27,36,44,6,55,20,3,10,43,25,39,41,45,15,21,8,18,2,61,56,14};
+	for(int i=0;i<25;i++){
+		L[i] = ROTL(L[i],rot_pos[i]);
+	}
 
 	/*** Pi ***/
+	/*
+	int start_x=0,start_y=1;
+	int x=start_x,y=start_y;
+	do{
+		//cout<<"old (x,y) = ("<<x<<","<<y<<") index :"<<x+5*y;
+		int new_y=(2*x+3*y)%5;
+		x=y;
+		y=new_y;
+		//cout<<" new (x,y) = ("<<x<<","<<y<<") index :"<<x+5*y;
+		cout<<x+5*y<<",";
 
+	}while( !((x == start_x) && (y == start_y)) );
+	*/
+
+	//0 not change
+	int pi_order[24]={16,8,21,24,4,15,23,19,13,12,2,20,14,22,9,6,1,10,7,11,17,18,3,5};
+	bitset<64> L5=L[5];
+	for(int i=23;i>0;i--){
+		L[ pi_order[i] ]=L[ pi_order[i-1] ];
+	}
+	L[16]=L5;
 
 	/*** Xi ***/
-
+	for(int y=0;y<5;y++){
+		bitset<64>tmpL[2];
+		tmpL[0]=L[0+5*y];
+		tmpL[1]=L[1+5*y];
+		L[0+5*y] ^= ( ~L[1+5*y] & L[2+5*y] );
+		L[1+5*y] ^= ( ~L[2+5*y] & L[3+5*y] );
+		L[2+5*y] ^= ( ~L[3+5*y] & L[4+5*y] );
+		L[3+5*y] ^= ( ~L[4+5*y] & tmpL[0] );
+		L[4+5*y] ^= ( ~tmpL[0] & tmpL[1] );
+	}
 
 	/*** Iota ***/
+	L[0]^=singleRC;
 
+	string metaString;
+	for(int i=0;i<25;i++){
+		//cout<<L[24-i];
+		metaString+=L[24-i].to_string();
+	}
+	return Binary(metaString);
 }
