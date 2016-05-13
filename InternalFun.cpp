@@ -54,7 +54,7 @@ Binary roundFun(Binary stateVar, bitset<64> singleRC)
 {
 
 	/*** TODO: Implement your SHA3's 5 functions as follows ***/
-	//break down the stateVar into lanes
+	//break down the stateVar into lanes 5x5x64
 	bitset<64> L[25];
 	string stateVarStr = stateVar.to_string();
 	for(int y=0;y<5;y++){
